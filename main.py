@@ -4,6 +4,7 @@ from argparse import Namespace
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
+from config import MODEL_NAME, SYSTEM_PROMPT, TEMPERATURE
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="AI Code Assistant")
@@ -11,13 +12,23 @@ def main() -> None:
     parser.add_argument("--verbose", action="store_true", help="Enable verbose output")
     args = parser.parse_args()    
     
-    messages = [types.Content(role="user", parts=[types.Part(text=args.user_prompt)])]
+    messages = [
+        types.Content(
+            role="user", 
+            parts=[
+                types.Part(text=args.user_prompt)
+            ]
+        )
+    ]
     client = get_genai_client()
-
     response = client.models.generate_content(
-        model="gemini-2.5-flash", 
-        contents=messages)
-    
+        model=MODEL_NAME,
+        contents=messages,
+        config=types.GenerateContentConfig(
+            system_instruction=SYSTEM_PROMPT,
+            temperature=TEMPERATURE
+        )
+    )
     print_prompt_output(args, response)
 
 
