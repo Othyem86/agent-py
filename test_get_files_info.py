@@ -2,7 +2,12 @@ from functions.get_files_info import get_files_info
 
 def test() -> None:
     working_dir = "calculator"
-    directories = [".", "pkg", "/bin", "../"]
+    directories = [
+        ".",
+        "pkg",
+        "/bin",
+        "../"
+    ]
 
     for dir in directories:
         print(f"Result for '{dir}':")
