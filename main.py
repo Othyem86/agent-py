@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from google import genai
 from google.genai import types
 from config import MODEL_NAME, SYSTEM_PROMPT, TEMPERATURE
+from call_function import available_functions
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="AI Code Assistant")
@@ -25,8 +26,9 @@ def main() -> None:
         model=MODEL_NAME,
         contents=messages,
         config=types.GenerateContentConfig(
-            system_instruction=SYSTEM_PROMPT,
-            temperature=TEMPERATURE
+            temperature=TEMPERATURE,
+            tools=[available_functions], 
+            system_instruction=SYSTEM_PROMPT
         )
     )
     print_prompt_output(args, response)
@@ -52,8 +54,12 @@ def print_prompt_output(args: Namespace, response: genai.Client) -> None:
         print(f"Response tokens: {response.usage_metadata.candidates_token_count}")
         print()
 
-    print("Response:")
-    print(response.text)
+    if response.function_calls:
+        for f in response.function_calls:
+            print(f"Calling function: {f.name}({f.args})")
+    else:
+        print("Response:")
+        print(response.text)
 
 
 if __name__ == "__main__":
