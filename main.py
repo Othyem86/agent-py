@@ -54,23 +54,25 @@ def print_prompt_output(args: Namespace, response: genai.Client) -> None:
         print(f"Response tokens: {response.usage_metadata.candidates_token_count}")
         print()
 
-    function_results = []
-    if response.function_calls:
-        for f in response.function_calls:
-            function_call_result = call_function(f, args.verbose)
-            if len(function_call_result.parts) == 0:
-                raise Exception(f"Error: Parts list in call function call result is empty")
-            if function_call_result.parts[0].function_response is None:
-                raise Exception(f"Error: Invalid function response in call function call result")
-            if function_call_result.parts[0].function_response.response is None:
-                raise Exception(f"Error: Invalid response in function response")
-            if args.verbose:
-                print(f"-> {function_call_result.parts[0].function_response.response}")
-            function_results.append(function_call_result.parts[0])
-    else:
+    if not response.function_calls:
         print("Response:")
         print(response.text)
 
+    function_results = []
+    for f in response.function_calls:
+        function_call_result = call_function(f, args.verbose)
+
+        if not function_call_result.parts or len(function_call_result.parts) == 0:
+            raise Exception(f"Error: Parts list in call function call result is empty")
+        if not function_call_result.parts[0].function_response:
+            raise Exception(f"Error: Invalid function response in call function call result")
+        if not function_call_result.parts[0].function_response.response:
+            raise Exception(f"Error: Invalid response in function response")
+        
+        if args.verbose:
+            print(f"-> {function_call_result.parts[0].function_response.response}")
+        function_results.append(function_call_result.parts[0])
+        
 
 if __name__ == "__main__":
     main()
