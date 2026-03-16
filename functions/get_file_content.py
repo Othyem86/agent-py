@@ -26,7 +26,7 @@ def get_file_content(working_directory: str, file_path: str) -> str:
 
 schema_get_file_content = types.FunctionDeclaration(
     name="get_file_content",
-    description="Reads the contents of a specified file, relative to the working directory, up to a maximum number characters",
+    description=f"Reads the content (at most {MAX_CHARS} characters) of a specified file within the working directory",
     parameters=types.Schema(
         required=["file_path"],
         type=types.Type.OBJECT,

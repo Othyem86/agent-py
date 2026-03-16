@@ -1,3 +1,4 @@
+WORKING_DIRECTORY = "./calculator"
 MAX_CHARS = 10_000
 MODEL_NAME = "gemini-2.5-flash"
 TEMPERATURE = 0

@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 from google import genai
 from google.genai import types
 from config import MODEL_NAME, SYSTEM_PROMPT, TEMPERATURE
-from call_function import available_functions
+from call_function import available_functions, call_function
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="AI Code Assistant")
@@ -54,9 +54,19 @@ def print_prompt_output(args: Namespace, response: genai.Client) -> None:
         print(f"Response tokens: {response.usage_metadata.candidates_token_count}")
         print()
 
+    function_results = []
     if response.function_calls:
         for f in response.function_calls:
-            print(f"Calling function: {f.name}({f.args})")
+            function_call_result = call_function(f, args.verbose)
+            if len(function_call_result.parts) == 0:
+                raise Exception(f"Error: Parts list in call function call result is empty")
+            if function_call_result.parts[0].function_response is None:
+                raise Exception(f"Error: Invalid function response in call function call result")
+            if function_call_result.parts[0].function_response.response is None:
+                raise Exception(f"Error: Invalid response in function response")
+            if args.verbose:
+                print(f"-> {function_call_result.parts[0].function_response.response}")
+            function_results.append(function_call_result.parts[0])
     else:
         print("Response:")
         print(response.text)
