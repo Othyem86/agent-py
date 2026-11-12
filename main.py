@@ -1,5 +1,27 @@
+import os
+from dotenv import load_dotenv
+from openai import OpenAI
+
 def main():
-    print("Hello from agent-py!")
+    load_dotenv()
+    api_key = os.environ.get("OPENROUNTER_APY_KEY")
+    if not api_key:
+        raise RuntimeError("OPENROUNTER_APY_KEY evironment variable not set")
+    client = OpenAI(
+        base_url="https://openrouter.ai/api/v1",
+        api_key=api_key,
+    )
+    response = client.chat.completions.create(
+        model="openrouter/free",
+        messages=[
+            {
+                "role": "user",
+                "content": "Why is Patrick Steward considered the greatest captain in the Star Trek franchise? Use one paragraph maximum.",
+            }
+        ],
+    )
+    print("Response")
+    print(response.choices[0].message.content)
 
 
 if __name__ == "__main__":
