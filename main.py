@@ -1,4 +1,5 @@
 import os
+import argparse
 from dotenv import load_dotenv
 from openai import OpenAI
 
@@ -7,6 +8,10 @@ def main():
     api_key = os.environ.get("OPENROUNTER_APY_KEY")
     if not api_key:
         raise RuntimeError("OPENROUNTER_APY_KEY evironment variable not set")
+    
+    parser = argparse.ArgumentParser(description="Chatbot")
+    parser.add_argument("user_prompt", type=str, help="User prompt")
+    args = parser.parse_args()
     client = OpenAI(
         base_url="https://openrouter.ai/api/v1",
         api_key=api_key,
@@ -16,7 +21,7 @@ def main():
         messages=[
             {
                 "role": "user",
-                "content": "Why is Patrick Steward considered the greatest captain in the Star Trek franchise? Use one paragraph maximum.",
+                "content": args.user_prompt,
             }
         ],
     )
